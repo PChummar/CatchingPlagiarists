@@ -1,0 +1,26 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/bharathychummar/Documents/EE312/CatchingPlagiarists/plagiarismCatcher.cpp
+sys/types.h
+-
+dirent.h
+-
+errno.h
+-
+vector
+-
+string
+-
+iostream
+-
+cstdlib
+-
+fstream
+-
+
