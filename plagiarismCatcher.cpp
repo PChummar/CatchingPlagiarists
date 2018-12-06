@@ -6,6 +6,8 @@
 #include <iostream>
 #include <cstdlib>
 #include <fstream>
+#include <cstring>
+#include <algorithm>
 
 using namespace std;
 
@@ -21,10 +23,10 @@ typedef struct StackLL {
         top = NULL;
     }
     void push(int a){
-            StackNode* add = new StackNode;
-            add->index = a;
-            add->next = top;
-            top = add;
+        StackNode* add = new StackNode;
+        add->index = a;
+        add->next = top;
+        top = add;
     }
 } StackLL;
 
@@ -35,6 +37,17 @@ void update(vector< vector<int> > &matrix, int first, int second){
     if (second < first){
         matrix[second][first]++;
     }
+}
+
+struct similars{
+    int similarities;
+    string file1;
+    string file2;
+};
+
+bool compare(const similars &a, const similars &b)
+{
+    return a.similarities < b.similarities;
 }
 
 /*function... might want it in some class?*/
@@ -61,10 +74,13 @@ void hashFunction(vector<string> &key, StackLL hashTable[], int index){
         wordEdit += key[i];
     }
     char x;
-    int hash = 0;
+    unsigned long hash = 0;
+    int multiplier = 1;
     for(int j= 0; j<wordEdit.length(); j++){
-        hash += wordEdit.at(j);
+        hash += ((wordEdit.at(j))*(wordEdit.length()-j-1)*multiplier);
+        multiplier = multiplier*37;
     }
+    hash = hash%100000;
     hashTable[hash].push(index);
 }
 
@@ -77,23 +93,18 @@ int main(int argc, char *argv[])
     int numWords = atoi(argv[2]);
 
     int numSimilarities = atoi(argv[3]);
-    StackLL hashTable[HASHLENGTH];
+    StackLL hashTable[100000];
     //each entry of this vector will hold the name of a file in the directory being processed
     vector<string> files = vector<string>();
 
     //fills the file vector with the names of the files in the directory
     getdir(dir,files);
 
-    //prints the inex of each file in the file vector along with the file name
-    for (unsigned int i = 0;i < files.size();i++) {
-        cout << i << files[i] << endl;
-    }
-
     //iterates through each file name
     for(int i = 2; i < files.size(); i++){
         string currentFile = files[i]; //Holds the current file
         ifstream file; //input stream for the current file
-        file.open(currentFile);
+        file.open(currentFile.c_str());
         if(!file.is_open()){
             cout << "File can not be accessed" <<endl;
         }
@@ -120,8 +131,8 @@ int main(int argc, char *argv[])
             }
         }
     }
-    vector<vector<int>> matrix(files.size(), vector<int>(files.size(), 0));
-    for (int i = 0; i < HASHLENGTH; i++){
+    vector<vector<int> > matrix(files.size(), vector<int>(files.size(), 0));
+    for (int i = 0; i < HASHLENGTH; i++){ // filling in 2D matrix with number of similarities from hash table
         StackNode* curr = hashTable[i].top;
         if(curr != NULL){
             StackNode *second = curr->next;
@@ -137,12 +148,24 @@ int main(int argc, char *argv[])
             }
         }
     }
+
+    vector<similars> arr; // vector of files that hae more similarities than specified in command line
+    int iterator = 0;
     for(int i = 0; i < files.size(); i++){
         for(int j = i + 1; j < files.size(); j++){
             if (matrix[i][j] > numSimilarities) {
-                cout << matrix[i][j] << " " << files[i] << " " << files[j] << endl;
+                arr.push_back(similars());
+                arr[iterator].similarities = matrix[i][j];
+                arr[iterator].file1 = files[i];
+                arr[iterator].file2 = files[j];
+                iterator++;
             }
         }
     }
+
+    std::sort(arr.rbegin(), arr.rend(),compare); // sort vector of files that were supposed to be printed out
+    for(int i = 0;i<iterator;i++){
+        cout << arr[i].similarities << " " << arr[i].file1 << " " << arr[i].file2 << endl;
+    } //print out sorted vector
     return 0;
 }
