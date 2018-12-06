@@ -1,0 +1,18 @@
+Files in this program:
+plagiarismCatcher.cpp
+
+No makefile
+
+Compile with:
+g++ -o plagiarismCatcher plagiarismCacher.cpp 
+
+Example command to run:
+./plagiarismCatcher path/to/files 6 200
+
+where the first command line argument is the path to the files (uneccessary if folder containing the files is already with the executables), 
+first number is the chunk of number of word sequences being checked for plagiarism, and the second number is the minimum number of similarities 
+checked for
+
+the files with more similarities than the second number given in the command line are listed in descending order of similarities
+
+
